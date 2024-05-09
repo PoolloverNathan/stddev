@@ -12,6 +12,7 @@
   }: let
     main = {
       name,
+      port ? 2352,
       systems ? ["x86_64-linux"],
       extensions ? _: [],
       nixpkgsConfig ? {},
@@ -83,7 +84,7 @@
               proc = /proc;
               tmp = /tmp;
               command = ''
-                TMPDIR=/tmp HOME=/tmp/home exec nix develop path:. -c ${mkVsCode pkgs.vscode-fhs}/bin/code serve-web --host 0.0.0.0 --port 2352 --without-connection-token --verbose --user-data-dir /tmp/vscode
+                TMPDIR=/tmp HOME=/tmp/home exec nix develop path:. -c ${mkVsCode pkgs.vscode-fhs}/bin/code serve-web --host 0.0.0.0 --port ${toString port} --without-connection-token --verbose --user-data-dir /tmp/vscode
               '';
             }}";
           };
