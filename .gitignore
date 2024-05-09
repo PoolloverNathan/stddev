@@ -1,2 +1,4 @@
 .Trash-*/
 .vscode/usr/
+.vscode/home/
+**/.*.sw?

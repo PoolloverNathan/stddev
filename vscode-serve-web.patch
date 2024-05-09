@@ -1,0 +1,7 @@
+--- nixpkgs/pkgs/applications/editors/vscode/with-extensions.nix
++++ nixpkgs/pkgs/applications/editors/vscode/with-extensions.nix
+@@ -60,3 +60,3 @@
+   extensionsFlag = ''
+-    --add-flags "--extensions-dir ${combinedExtensionsDrv}/share/vscode/extensions"
++    --append-flags "--extensions-dir ${combinedExtensionsDrv}/share/vscode/extensions"
+   '';

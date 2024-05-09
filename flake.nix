@@ -18,6 +18,7 @@
       devDeps ? pkgs: [pkgs.nix pkgs.git],
       extraShells ? system: pkgs: {},
       packages ? system: pkgs: {},
+      patches ? {},
     }:
       builtins.foldl'
       nixpkgs.lib.attrsets.recursiveUpdate
@@ -30,7 +31,14 @@
                 inherit system pkgs;
               }
               // args);
-          pkgs = import nixpkgs {
+          pkgs = import ((import nixpkgs {
+            inherit system;
+          }).applyPatches {
+            name = "nixpkgs-patched-${name}";
+            src = nixpkgs;
+            patches = patches.nixpkgs or [./vscode-serve-web.patch];
+            patchFlags = ["-t" "-p1"];
+          }) {
             inherit system;
             config.allowUnfree = true; # vscodium serve-web doesn't work
           };
@@ -49,32 +57,32 @@
           apps.${system} = {
             ide.type = "app";
             ide.program = "${encase {
-                rw.work.${name} = "$origdir";
-                rw.tmp = /tmp;
-                rw.run = /run;
-                ro.nix = /nix;
-                ro.dev = /dev;
-                ro.etc = /etc;
-                wd = /work/${name};
-                net = true;
-                proc = /proc;
-                command = ''
-                  HOME=/work/${name}/.vscode/usr/home nix develop -c ${mkVsCode pkgs.vscodium-fhs}/bin/codium --in-process-gpu --disable-software-rasterizer --disable-gpu --no-sandbox -w . --user-data-dir .vscode/usr
-                '';
+              rw.work.${name} = "$origdir";
+              rw.run = /run;
+              ro.nix = /nix;
+              ro.dev = /dev;
+              ro.etc = /etc;
+              wd = /work/${name};
+              net = true;
+              proc = /proc;
+              tmp = /tmp;
+              command = ''
+                TMPDIR=/tmp HOME=$(pwd)/.vscode/home exec nix develop path:. -c ${mkVsCode pkgs.vscodium-fhs}/bin/codium --in-process-gpu --disable-software-rasterizer --disable-gpu --no-sandbox -w . --user-data-dir .vscode/usr
+              '';
             }}";
             web-ide.type = "app";
             web-ide.program = "${encase {
               rw.work.${name} = "$origdir";
               rw.run = /run;
               ro.nix = /nix;
-              ro.inst.vscode = "${mkVsCode pkgs.vscode-fhs}";
+              ro.dev = /dev;
+              ro.etc = /etc;
               wd = /work/${name};
               net = true;
               proc = /proc;
               tmp = /tmp;
               command = ''
-                ${pkgs.tree}/bin/tree / -I nix
-                exec /inst/vscode/bin/code serve-web --in-process-gpu --disable-software-rasterizer --disable-gpu --no-sandbox --host 0.0.0.0 --port 2352 --without-connection-token --verbose --user-data-dir .vscode/usr
+                TMPDIR=/tmp HOME=$(pwd)/.vscode/home exec nix develop path:. -c ${mkVsCode pkgs.vscode-fhs}/bin/code serve-web --host 0.0.0.0 --port 2352 --without-connection-token --verbose --user-data-dir .vscode/usr
               '';
             }}";
           };
