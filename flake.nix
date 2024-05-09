@@ -14,6 +14,7 @@
       name,
       systems ? ["x86_64-linux"],
       extensions ? _: [],
+      nixpkgsConfig ? {},
       deps ? _: [],
       devDeps ? pkgs: [pkgs.nix pkgs.git],
       extraShells ? system: pkgs: {},
@@ -40,7 +41,7 @@
             patchFlags = ["-t" "-p1"];
           }) {
             inherit system;
-            config.allowUnfree = true; # vscodium serve-web doesn't work
+            config = { allowUnfree = true; } // nixpkgsConfig; # vscodium serve-web doesn't work
           };
           mkVsCode = vscode:
             pkgs.vscode-with-extensions.override {
@@ -82,7 +83,7 @@
               proc = /proc;
               tmp = /tmp;
               command = ''
-                TMPDIR=/tmp HOME=$(pwd)/.vscode/home exec nix develop path:. -c ${mkVsCode pkgs.vscode-fhs}/bin/code serve-web --host 0.0.0.0 --port 2352 --without-connection-token --verbose --user-data-dir .vscode/usr
+                TMPDIR=/tmp HOME=/tmp/home exec nix develop path:. -c ${mkVsCode pkgs.vscode-fhs}/bin/code serve-web --host 0.0.0.0 --port 2352 --without-connection-token --verbose --user-data-dir /tmp/vscode
               '';
             }}";
           };
