@@ -70,7 +70,7 @@
               proc = /proc;
               tmp = /tmp;
               command = ''
-                TMPDIR=/tmp HOME=$(pwd)/.vscode/home exec nix develop path:. -c ${mkVsCode pkgs.vscodium-fhs}/bin/codium --in-process-gpu --disable-software-rasterizer --disable-gpu --no-sandbox -w . --user-data-dir .vscode/usr
+                TMPDIR=/tmp HOME=/tmp/home exec nix develop path:. -c ${mkVsCode pkgs.vscodium-fhs}/bin/codium --in-process-gpu --disable-software-rasterizer --disable-gpu --no-sandbox -w . --user-data-dir /tmp/vscode
               '';
             }}";
             web-ide.type = "app";
