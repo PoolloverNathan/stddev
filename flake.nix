@@ -16,6 +16,7 @@
       systems ? ["x86_64-linux"],
       extensions ? _: [],
       nixpkgsConfig ? {},
+      overlays ? [],
       deps ? _: [],
       devDeps ? pkgs: [pkgs.nix pkgs.git],
       extraShells ? system: pkgs: {},
@@ -41,7 +42,7 @@
             patches = patches.nixpkgs or [./vscode-serve-web.patch];
             patchFlags = ["-t" "-p1"];
           }) {
-            inherit system;
+            inherit system overlays;
             config = { allowUnfree = true; } // nixpkgsConfig; # vscodium serve-web doesn't work
           };
           mkVsCode = vscode:
@@ -50,7 +51,7 @@
               vscodeExtensions = extensions vscode-extensions.extensions.${system}.open-vsx;
             };
         in {
-          devShells.${system}= {
+          devShells.${system} = {
             default = pkgs.mkShell {
               name = "${name}-dev";
               buildInputs = deps pkgs ++ devDeps pkgs;
