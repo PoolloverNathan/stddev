@@ -22,6 +22,7 @@
       extraShells ? system: pkgs: {},
       packages ? system: pkgs: {},
       patches ? {},
+      functor ? builtins.throw "flake ${name} cannot be invoked",
     }:
       builtins.foldl'
       nixpkgs.lib.attrsets.recursiveUpdate
@@ -91,6 +92,7 @@
           };
           formatter.${system} = pkgs.alejandra;
           packages.${system} = packages system pkgs;
+          __functor = self: functo;
         })
         systems);
   in
