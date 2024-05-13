@@ -92,7 +92,7 @@
           };
           formatter.${system} = pkgs.alejandra;
           packages.${system} = packages system pkgs;
-          __functor = self: functo;
+          __functor = self: functor;
         })
         systems);
   in
